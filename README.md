@@ -1,6 +1,6 @@
 # Prior Authorization Reference Implementation Provider Client Server
 
-This is a Client Server for the Da Vinci Prior Authorization Reference Implementation, which can be found [here](https://github.com/HL7-DaVinci/prior-auth).
+This is a Client Server for the Da Vinci Prior Authorization Reference Implementation, which can be found [here](https://github.com/HL7-DaVinci/prior-auth). The Client Server is used to be the provider using the Prior Auth service. Currently the server handles subscriptions (Rest-Hook and WebSocket).
 
 ## Requirements
 
@@ -16,6 +16,12 @@ Build, test, and start the microservice:
 ./gradlew run
 ```
 
+Run in debug mode:
+
+```
+./gradlew run --args='debug'
+```
+
 Access the microservice:
 
 ```
@@ -23,28 +29,17 @@ curl http://localhost:9090/fhir/SubscriptionNotification
 curl http://localhost:9090/fhir/Log
 ```
 
-## Usage
+## Using Rest-Hook Subscriptions
 
-First run the service:
+The Client Server provides the `/SubscriptionNotification` endpoint which can be used to receive Rest-Hook notifications by the Prior Auth service. To use the Prior Auth service read the documentation on the [Prior Authorization Server Reference Implementation](https://github.com/HL7-DaVinci/prior-auth).
 
-```
-./gradlew run
-```
+To use the Rest-Hook endpoint submit a Subscription to `/Subscription` on the Prior Auth server with the `channel.endpoint` set to `http://localhost:9090/fhir/SubscriptionNotification?identifier={identifier}&patient.identifier={patient}&status=active`.
 
-Run the Prior Authorization Server [(Reference Implementation)](https://github.com/HL7-DaVinci/prior-auth) and submit a PriorAuth request to `/Claim/$submit`. When a ClaimResponse comes back as `queued` or `PENDING` add a RESTHOOK subscription by `POST`ing the following to `/fhir/Subscription` to the PriorAuth Server:
+When the ClaimResponse is updated the Prior Auth server will send a `GET` request to the `channel.endpoint` provided. The Client server decodes the request, polls for the updated ClaimResponse and then deletes the ClaimResponse if the `outcome` is `complete` or `error`.
 
-```
-{
-  "resourceType": "Subscription",
-  "criteria": "identifier=[priorauth identifier]&patient.identifier=[patient id]&status=active",
-  "channel": {
-    "type": "rest-hook",
-    "endpoint": "http://localhost:9090/fhir/SubscriptionNotification?identifier=[priorauth identifier]&patient.identifier=[patient id]&status=active"
-  }
-}
-```
+## Using WebSocket Subscriptions
 
-This will create a new subscription. When a new ClaimResponse is created the notification will be sent to `fhir/SubscriptionNotification`.
+The `src/main/resources` directory provides the WebSocket subscription implementation. To use it open `index.html`. Once the Prior Auth server is running connect the WebSocket to the server by clicking the `Connect` button in the top left corner. When a Subscription logical id is ready to be bound enter the id in the text box and hit `Subscribe`.
 
 ## FHIR Services
 
