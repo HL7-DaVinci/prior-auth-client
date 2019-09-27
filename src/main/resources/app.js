@@ -12,7 +12,7 @@ function setConnected(connected) {
 }
 
 function connect() {
-  socket = new WebSocket("ws://localhost:9000/connect");
+  socket = new WebSocket("ws://localhost:9000/fhir/connect");
   stompClient = Stomp.over(socket);
   stompClient.connect({}, function(frame) {
     setConnected(true);
