@@ -12,7 +12,11 @@ function setConnected(connected) {
 }
 
 function connect() {
-  socket = new WebSocket("ws://localhost:9000/fhir/connect");
+  // let ws = "ws://localhost:9000/fhir/connect";
+  // let ws = "wss://localhost:9000/fhir/connect";
+  // let ws = "wss://davinci-prior-auth.logicahealth.org/fhir/connect";
+  let ws = "wss://davinci-prior-auth.logicahealth.org/fhir/connect";
+  socket = new WebSocket(ws);
   stompClient = Stomp.over(socket);
   stompClient.connect({}, function(frame) {
     setConnected(true);
