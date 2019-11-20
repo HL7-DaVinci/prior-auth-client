@@ -34,7 +34,7 @@ public class SubscriptionNotificationEndpoint {
   @Context
   private UriInfo uri;
 
-  @GET
+  @POST
   @Path("/")
   public Response subscriptionNotification(@QueryParam("identifier") String id,
       @QueryParam("patient.identifier") String patient, @QueryParam("status") String status) {
