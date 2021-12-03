@@ -1,13 +1,14 @@
 package org.hl7.davinci.providerclient;
 
-import org.apache.meecrowave.Meecrowave;
-
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ca.uhn.fhir.context.FhirContext;
 
 /**
  * The client for the Provider to use Prior Authorization is launched using this
  * app
  */
+@SpringBootApplication
 public class App {
 
   /**
@@ -24,28 +25,25 @@ public class App {
    * @param args - ignored.
    */
   public static void main(String[] args) {
-    if (args.length > 0) {
-      if (args[0].equalsIgnoreCase("debug")) {
-        debugMode = true;
-      }
+    if ((args.length > 0 && args[0].equalsIgnoreCase("debug")) || 
+    (System.getenv("debug") != null && System.getenv("debug").equalsIgnoreCase("true"))) {
+      debugMode = true;
     }
 
-    if (System.getenv("debug") != null) {
-      if (System.getenv("debug").equalsIgnoreCase("true")) {
-        debugMode = true;
-      }
-    }
+    SpringApplication server = new SpringApplication(App.class);
+    server.run(args);
+
 
     // Assemble the microservice
-    Meecrowave.Builder builder = new Meecrowave.Builder();
-    builder.setHttpPort(9090);
-    builder.setScanningPackageIncludes("org.hl7.davinci.providerclient");
-    builder.setJaxrsMapping("/fhir/*");
-    builder.setJsonpPrettify(true);
+    // Meecrowave.Builder builder = new Meecrowave.Builder();
+    // builder.setHttpPort(9090);
+    // builder.setScanningPackageIncludes("org.hl7.davinci.providerclient");
+    // builder.setJaxrsMapping("/fhir/*");
+    // builder.setJsonpPrettify(true);
 
-    // Launch the microservice
-    try (Meecrowave meecrowave = new Meecrowave(builder)) {
-      meecrowave.bake().await();
-    }
+    // // Launch the microservice
+    // try (Meecrowave meecrowave = new Meecrowave(builder)) {
+    //   meecrowave.bake().await();
+    // }
   }
 }

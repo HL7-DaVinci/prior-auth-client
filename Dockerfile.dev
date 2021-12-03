@@ -6,8 +6,7 @@ WORKDIR /prior-auth-client
 COPY --chown=gradle:gradle . .
 # Embed CDS Library
 # RUN gradle embedCdsLibrary
-RUN gradle installBootDist
 # Expose port to access the app
-EXPOSE 9090
+EXPOSE 9015
 # Command to run our app
-CMD gradle bootRun
+CMD ./dockerRunnerDev.sh

@@ -16,7 +16,7 @@ public class PALogger {
     private static PALogger singletonPALogger;
 
     private Logger logger;
-    private static String LOG_FILE = "clientprovider.log";
+    private static String LOG_FILE = "logs/clientprovider.log";
 
     private PALogger() {
         this.logger = Logger.getLogger("clientprovider");
