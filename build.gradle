@@ -21,6 +21,12 @@ repositories {
   jcenter()
 }
 
+bootRun {  
+    if (project.hasProperty('debug')) { 
+        jvmArgs=["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:9016"]
+    }
+} 
+
 dependencies {
     implementation('org.opencds.cqf:cql-engine:1.3.12.1') {
         exclude group: 'org.slf4j', module: 'slf4j-log4j12'

@@ -8,5 +8,6 @@ COPY --chown=gradle:gradle . .
 # RUN gradle embedCdsLibrary
 # Expose port to access the app
 EXPOSE 9015
+EXPOSE 9016
 # Command to run our app
 CMD ./dockerRunnerDev.sh
