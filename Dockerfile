@@ -4,8 +4,6 @@ FROM gradle:6.9.0-jdk11
 WORKDIR /prior-auth-client
 # Copy app files to container
 COPY --chown=gradle:gradle . .
-# Embed CDS Library
-# RUN gradle embedCdsLibrary
 RUN gradle installBootDist
 # Expose port to access the app
 EXPOSE 9090

@@ -9,7 +9,7 @@
             "name": "Debug CRD (Local + Docker)", // gradle bootRun -Pdebug,
             "request": "attach",
             "hostName": "localhost",
-            "port": 9016,
+            "port": 9091,
         }
     ]
 }
