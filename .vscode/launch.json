@@ -6,7 +6,7 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Debug CRD (Local + Docker)", // gradle bootRun -Pdebug,
+            "name": "Debug Prior Auth Client (Local + Docker)", // gradle bootRun -Pdebug,
             "request": "attach",
             "hostName": "localhost",
             "port": 9091,
