@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.Status;
+import org.hl7.davinci.providerclient.PALogger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.ClaimResponse;
@@ -22,24 +25,21 @@ import okhttp3.OkHttpClient;
  * The SubscriptionNotification endpoint to send subscriptions notifications to
  * and process them
  */
-@RequestScoped
-@Path("SubscriptionNotification")
+@CrossOrigin
+@RestController
+@RequestMapping("SubscriptionNotification")
 public class SubscriptionNotificationEndpoint {
 
   static final Logger logger = PALogger.getLogger();
-  private static final String BASE_URL = "http://localhost:9000/fhir/";
+  private static final String BASE_URL = "http://localhost:9015/fhir/";
   private static final String CLAIM_RESPONSE = "ClaimResponse";
   private static final String SUBSCRIPTION = "Subscription";
 
-  @Context
-  private UriInfo uri;
-
-  @GET
-  @Path("/")
-  public Response subscriptionNotification(@QueryParam("identifier") String id,
-      @QueryParam("patient.identifier") String patient, @QueryParam("status") String status) {
+  @GetMapping("")
+  public ResponseEntity<String> subscriptionNotification(@RequestParam(name = "identifier") String id,
+  @RequestParam(name = "patient.identifier") String patient, @RequestParam(name = "status") String status) {
     logger.info("SubscriptionNotificationEndpoint::Notification(" + id + ", " + patient + ", " + status + ")");
-    Status returnStatus = Status.OK;
+    HttpStatus returnStatus = HttpStatus.OK;
 
     try {
       // Send REST request for the new ClaimResponse...
@@ -66,11 +66,10 @@ public class SubscriptionNotificationEndpoint {
             .execute();
       }
     } catch (IOException e) {
-      returnStatus = Status.BAD_REQUEST;
+      returnStatus = HttpStatus.BAD_REQUEST;
       logger.log(Level.SEVERE, "SubscriptionNotificationEndpoint::IOException in polling request", e);
     }
-
-    return Response.status(returnStatus).type("application/fhir+json").build();
+    return new ResponseEntity<>(returnStatus);
   }
 
 }
