@@ -4,15 +4,11 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.hl7.davinci.providerclient.PALogger;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.bind.annotation.*;
 
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.ClaimResponse;
@@ -35,10 +31,13 @@ public class SubscriptionNotificationEndpoint {
   private static final String CLAIM_RESPONSE = "ClaimResponse";
   private static final String SUBSCRIPTION = "Subscription";
 
-  @GetMapping("")
-  public ResponseEntity<String> subscriptionNotification(@RequestParam(name = "identifier") String id,
-  @RequestParam(name = "patient.identifier") String patient, @RequestParam(name = "status") String status) {
+  @PostMapping(value = "", consumes = { MediaType.APPLICATION_JSON_VALUE, "application/fhir+json" })
+  @ResponseBody
+  public ResponseEntity<String> subscriptionNotification(HttpEntity<String> entity, @RequestParam(name = "identifier") String id,
+                                                         @RequestParam(name = "patient.identifier") String patient, @RequestParam(name = "status") String status) {
+
     logger.info("SubscriptionNotificationEndpoint::Notification(" + id + ", " + patient + ", " + status + ")");
+    logger.info("Body: " + entity.getBody());
     HttpStatus returnStatus = HttpStatus.OK;
 
     try {
@@ -56,6 +55,8 @@ public class SubscriptionNotificationEndpoint {
       // Check the ClaimResponse outcome...
       ClaimResponse claimResponse = (ClaimResponse) claimResponseBundle.getEntry().get(0).getResource();
       RemittanceOutcome outcome = claimResponse.getOutcome();
+
+      logger.info("Claim Response Outcome:" + outcome);
       if (outcome == RemittanceOutcome.COMPLETE || outcome == RemittanceOutcome.ERROR) {
         // Delete the subscription...
         logger.info("SubscriptionNotificationEndpoint::Delete Subscription (" + id + ", " + patient + ")");
@@ -71,5 +72,4 @@ public class SubscriptionNotificationEndpoint {
     }
     return new ResponseEntity<>(returnStatus);
   }
-
 }
