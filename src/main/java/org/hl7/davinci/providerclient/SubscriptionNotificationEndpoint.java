@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import ca.uhn.fhir.parser.JsonParser;
+import org.hl7.fhir.r4.model.Parameters;
+import org.hl7.fhir.r4.model.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,7 +40,7 @@ public class SubscriptionNotificationEndpoint {
                                                          @RequestParam(name = "patient.identifier") String patient, @RequestParam(name = "status") String status) {
 
     logger.info("SubscriptionNotificationEndpoint::Notification(" + id + ", " + patient + ", " + status + ")");
-    logger.info("Body: " + entity.getBody());
+    logger.info("Notification Body: " + entity.getBody());
     HttpStatus returnStatus = HttpStatus.OK;
 
     try {
@@ -58,9 +61,14 @@ public class SubscriptionNotificationEndpoint {
 
       logger.info("Claim Response Outcome:" + outcome);
       if (outcome == RemittanceOutcome.COMPLETE || outcome == RemittanceOutcome.ERROR) {
+        //Get SubscriptionId from the response body
+        Bundle notification = parser.parseResource(Bundle.class, entity.getBody());
+        Resource subscriptionParams = notification.getEntry().get(0).getResource();
+        String subscriptionId = ((Parameters) subscriptionParams).getParameter().get(0).getResource().getIdElement().getIdPart();
+
         // Delete the subscription...
-        logger.info("SubscriptionNotificationEndpoint::Delete Subscription (" + id + ", " + patient + ")");
-        url = BASE_URL + SUBSCRIPTION + "?identifier=" + id + "&patient.identifier=" + patient;
+        logger.info("SubscriptionNotificationEndpoint::Delete Subscription (" + subscriptionId + ", " + patient + ")");
+        url = BASE_URL + SUBSCRIPTION + "?identifier=" + subscriptionId + "&patient.identifier=" + patient;
         logger.fine("SubscriptionNotificationEndpoint::url(" + url + ")");
         response = client
             .newCall(new okhttp3.Request.Builder().header("Accept", "application/fhir+json").url(url).delete().build())

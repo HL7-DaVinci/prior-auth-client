@@ -35,7 +35,7 @@ The Client Server provides the `/SubscriptionNotification` endpoint which can be
 
 To use the Rest-Hook endpoint submit a Subscription to `/Subscription` on the Prior Auth server with the `channel.endpoint` set to `http://localhost:9090/fhir/SubscriptionNotification?identifier={identifier}&patient.identifier={patient}&status=active`.
 
-When the ClaimResponse is updated the Prior Auth server will send a `GET` request to the `channel.endpoint` provided. The Client server decodes the request, polls for the updated ClaimResponse and then deletes the ClaimResponse if the `outcome` is `complete` or `error`.
+When the ClaimResponse is updated the Prior Auth server will send a `POST` request to the `channel.endpoint` provided. The Client server decodes the request, polls for the updated ClaimResponse and then deletes the ClaimResponse if the `outcome` is `complete` or `error`.
 
 ## Using WebSocket Subscriptions
 
@@ -46,8 +46,8 @@ The `src/main/resources` directory provides the WebSocket subscription implement
 The service endpoints in the table below are relative to `http://localhost:9090/fhir`.
 
 | Service                     | Methods | Description                                                 |
-| --------------------------- | ------- | ----------------------------------------------------------- |
-| `/SubscriptionNotification` | `GET`   | Endpoint to send notifications for an update Claimresponse. |
+| --------------------------- |---------| ----------------------------------------------------------- |
+| `/SubscriptionNotification` | `POST`  | Endpoint to send notifications for an update Claimresponse. |
 | `/Log`                      | `GET`   | Gets the microservice log                                   |
 
 ## Questions and Contributions
