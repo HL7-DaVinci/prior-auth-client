@@ -7,6 +7,8 @@ import java.util.logging.Logger;
 import ca.uhn.fhir.parser.JsonParser;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,9 +32,12 @@ import okhttp3.OkHttpClient;
 public class SubscriptionNotificationEndpoint {
 
   static final Logger logger = PALogger.getLogger();
-  private static final String BASE_URL = "http://localhost:9015/fhir/";
+  private static final String BASE_URL = "http://localhost:9015";
   private static final String CLAIM_RESPONSE = "ClaimResponse";
   private static final String SUBSCRIPTION = "Subscription";
+
+  @Autowired
+  private Environment env;
 
   @PostMapping(value = "", consumes = { MediaType.APPLICATION_JSON_VALUE, "application/fhir+json" })
   @ResponseBody
@@ -44,8 +49,14 @@ public class SubscriptionNotificationEndpoint {
     HttpStatus returnStatus = HttpStatus.OK;
 
     try {
+      String baseURL = env.getProperty("prior_auth_server_url");
+
+      if (baseURL == null || baseURL.isEmpty()) {
+        baseURL = BASE_URL;
+      }
+
       // Send REST request for the new ClaimResponse...
-      String url = BASE_URL + CLAIM_RESPONSE + "?identifier=" + id + "&patient.identifier=" + patient + "&status="
+      String url = baseURL + "/fhir/" + CLAIM_RESPONSE + "?identifier=" + id + "&patient.identifier=" + patient + "&status="
           + status;
       logger.fine("SubscriptionNotificationEndpoint::url(" + url + ")");
       OkHttpClient client = new OkHttpClient();
@@ -68,7 +79,7 @@ public class SubscriptionNotificationEndpoint {
 
         // Delete the subscription...
         logger.info("SubscriptionNotificationEndpoint::Delete Subscription (" + subscriptionId + ", " + patient + ")");
-        url = BASE_URL + SUBSCRIPTION + "?identifier=" + subscriptionId + "&patient.identifier=" + patient;
+        url = baseURL + "/fhir/" + SUBSCRIPTION + "?identifier=" + subscriptionId + "&patient.identifier=" + patient;
         logger.fine("SubscriptionNotificationEndpoint::url(" + url + ")");
         response = client
             .newCall(new okhttp3.Request.Builder().header("Accept", "application/fhir+json").url(url).delete().build())
