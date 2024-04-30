@@ -77,6 +77,7 @@ public class PALogger {
 
     private static void createLogFileIfNotExists() throws IOException {
         File logFile = new File(LOG_FILE);
+        logFile.getParentFile().mkdirs();
         logFile.createNewFile();
     }
 }
