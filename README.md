@@ -2,6 +2,8 @@
 
 This is a Client Server for the Da Vinci Prior Authorization Reference Implementation, which can be found [here](https://github.com/HL7-DaVinci/prior-auth). The Client Server is used to be the provider using the Prior Auth service. Currently the server handles subscriptions (Rest-Hook and WebSocket).
 
+A live demo is hosted by [HL7 FHIR Foundry](https://foundry.hl7.org/products/19918f5b-db29-4f31-b7d7-5bfc9ed63da0), where you may also download curated configurations to run yourself.
+
 ## Requirements
 
 - Java JDK 8
