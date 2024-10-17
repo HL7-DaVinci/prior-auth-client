@@ -19,6 +19,9 @@ function connect() {
     console.log("Connected: " + frame);
     stompClient.subscribe("/private/notification", function(msg) {
       showMessage(msg.body);
+    }, function(error) {
+      console.log("Connection failed: " + error);
+      alert("Failed to connect. Please try again.");
     });
   });
 }
@@ -39,6 +42,28 @@ function showMessage(message) {
   $("#messages").append("<tr><td>" + message + "</td></tr>");
 }
 
+function createRestHookSubscription() {
+  const subscriptionData = {
+    resourceType: "Subscription",
+    // Add other necessary FHIR Subscription fields here
+  };
+
+  $.ajax({
+    url: BASE_URL + "/fhir/Subscription",
+    type: "POST",
+    data: JSON.stringify(subscriptionData),
+    contentType: "application/fhir+json",
+    success: function(response) {
+      alert("Subscription created successfully");
+      console.log(response);
+    },
+    error: function(error) {
+      alert("Failed to create subscription");
+      console.log(error);
+    }
+  });
+}
+
 $(function() {
   $("form").on("submit", function(e) {
     e.preventDefault();
@@ -51,5 +76,8 @@ $(function() {
   });
   $("#send").click(function() {
     bindId();
+  });
+  $("#create-resthook").click(function() {
+    createRestHookSubscription();
   });
 });
