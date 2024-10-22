@@ -1,3 +1,6 @@
+// Define BASE_URL here
+const BASE_URL = "http://localhost:9015"; // Replace with the correct base URL for your server
+
 var stompClient = null;
 
 function setConnected(connected) {
@@ -12,7 +15,7 @@ function setConnected(connected) {
 }
 
 function connect() {
-  socket = new WebSocket("ws://localhost:9000/fhir/connect");
+  socket = new WebSocket("ws://localhost:9015/fhir/connect");
   stompClient = Stomp.over(socket);
   stompClient.connect({}, function(frame) {
     setConnected(true);
@@ -43,9 +46,57 @@ function showMessage(message) {
 }
 
 function createRestHookSubscription() {
+  debugger;
   const subscriptionData = {
     resourceType: "Subscription",
-    // Add other necessary FHIR Subscription fields here
+    meta: {
+      profile: [
+        "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription"
+      ]
+    },
+    text: {
+      status: "generated",
+      div: "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Subscription</b><a name=\"subscription-admission\"></a></p></div>"
+    },
+    status: "active",
+    end: "2023-12-31T12:00:00Z", // Subscription end date
+    reason: "Topic-Based Subscription for PAS",
+    criteria: "http://hl7.org/SubscriptionTopic/priorauth", // Topic-based subscription criteria
+    _criteria: {
+      extension: [
+        {
+          url: "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria",
+          valueString: "ClaimResponse?identifier={claimResponseIdentifier}&patient.identifier={patientIdentifier}&status=active"
+        }
+      ]
+    },
+    channel: {
+      extension: [
+        {
+          url: "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-heartbeat-period",
+          valueUnsignedInt: 86400 // Heartbeat every 24 hours (in seconds)
+        },
+        {
+          url: "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-timeout",
+          valueUnsignedInt: 60 // Timeout in seconds
+        },
+        {
+          url: "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-max-count",
+          valuePositiveInt: 20 // Max number of notifications
+        }
+      ],
+      type: "rest-hook",
+      endpoint: "http://localhost:9015/notification", // Your dynamic notification endpoint
+      payload: "application/fhir+json",
+      _payload: {
+        extension: [
+          {
+            url: "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content",
+            valueCode: "id-only" // Only send resource IDs in the payload
+          }
+        ]
+      }
+    }
   };
 
   $.ajax({
@@ -54,12 +105,15 @@ function createRestHookSubscription() {
     data: JSON.stringify(subscriptionData),
     contentType: "application/fhir+json",
     success: function(response) {
+      debugger;
       alert("Subscription created successfully");
       console.log(response);
     },
     error: function(error) {
+      debugger;
       alert("Failed to create subscription");
       console.log(error);
+      console.log("Response text:", error.responseText);
     }
   });
 }

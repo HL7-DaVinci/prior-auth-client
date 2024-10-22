@@ -52,15 +52,21 @@
                 placeholder="1234-abcd-5678-efgh"
               />
             </div>
-            <button id="send" class="btn btn-default" type="submit">
+            <button id="send" class="btn btn-default d-block mb-2" type="submit">
               Subscribe
             </button>
+
+            <!-- ClaimResponse Identifier input -->
+            <label for="claimResponseIdentifier">ClaimResponse Identifier:</label>
+            <input type="text" id="claimResponseIdentifier" name="claimResponseIdentifier"><br><br>
+
+            <!-- Patient Identifier input -->
+            <label for="patientIdentifier">Patient Identifier:</label>
+            <input type="text" id="patientIdentifier" name="patientIdentifier"><br><br>
+            <button id="create-resthook" class="btn btn-default d-block" type="button">
+              Create REST-Hook Subscription
+            </button>
           </form>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6">
-          <button id="create-resthook" class="btn btn-default" type="button">Create REST-Hook Subscription</button>
         </div>
       </div>
       <div class="row">
