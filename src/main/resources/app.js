@@ -51,18 +51,6 @@ function createRestHookSubscription() {
 
   const subscriptionData = {
     resourceType: "Subscription",
-    meta: {
-      profile: [
-        "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-subscription"
-      ]
-    },
-    text: {
-      status: "generated",
-      div: "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Subscription</b><a name=\"subscription-admission\"></a></p></div>"
-    },
-    status: "active",
-    end: "2023-12-31T12:00:00Z", // Subscription end date
-    reason: "Topic-Based Subscription for PAS",
     criteria: "http://hl7.org/SubscriptionTopic/priorauth", // Topic-based subscription criteria
     _criteria: {
       extension: [
@@ -72,30 +60,9 @@ function createRestHookSubscription() {
       ]
     },
     channel: {
-      extension: [
-        {
-          url: "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-heartbeat-period",
-          valueUnsignedInt: 86400 // Heartbeat every 24 hours (in seconds)
-        },
-        {
-          url: "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-timeout",
-          valueUnsignedInt: 60 // Timeout in seconds
-        },
-        {
-          url: "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-max-count",
-          valuePositiveInt: 20 // Max number of notifications
-        }
-      ],
       type: "rest-hook",
       endpoint: `http://localhost:9015/notify/${claimResponseIdentifier}`, // Use dynamic endpoint for notifications      payload: "application/fhir+json",
-      _payload: {
-        extension: [
-          {
-            url: "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-payload-content",
-            valueCode: "id-only" // Only send resource IDs in the payload
-          }
-        ]
-      }
+      payload: "application/fhir+json"
     }
   };
 
