@@ -46,7 +46,9 @@ function showMessage(message) {
 }
 
 function createRestHookSubscription() {
-  debugger;
+  const claimResponseIdentifier = $("#claimResponseIdentifier").val(); // Get identifier from input
+  const patientIdentifier = $("#patientIdentifier").val(); // Get patient identifier from input
+
   const subscriptionData = {
     resourceType: "Subscription",
     meta: {
@@ -66,8 +68,7 @@ function createRestHookSubscription() {
       extension: [
         {
           url: "http://hl7.org/fhir/uv/subscriptions-backport/StructureDefinition/backport-filter-criteria",
-          valueString: "ClaimResponse?identifier={claimResponseIdentifier}&patient.identifier={patientIdentifier}&status=active"
-        }
+          valueString: `ClaimResponse?identifier=${claimResponseIdentifier}&patient.identifier=${patientIdentifier}&status=active`        }
       ]
     },
     channel: {
@@ -86,8 +87,7 @@ function createRestHookSubscription() {
         }
       ],
       type: "rest-hook",
-      endpoint: "http://localhost:9015/notification", // Your dynamic notification endpoint
-      payload: "application/fhir+json",
+      endpoint: `http://localhost:9015/notify/${claimResponseIdentifier}`, // Use dynamic endpoint for notifications      payload: "application/fhir+json",
       _payload: {
         extension: [
           {
@@ -105,12 +105,10 @@ function createRestHookSubscription() {
     data: JSON.stringify(subscriptionData),
     contentType: "application/fhir+json",
     success: function(response) {
-      debugger;
       alert("Subscription created successfully");
       console.log(response);
     },
     error: function(error) {
-      debugger;
       alert("Failed to create subscription");
       console.log(error);
       console.log("Response text:", error.responseText);
